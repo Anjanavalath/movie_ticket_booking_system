@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import API from '../services/api';
 import { BookingContext } from '../context/BookingContext';
+import { AuthContext } from '../context/AuthContext';
 import BookingSteps from '../components/BookingSteps';
 import toast from 'react-hot-toast';
 import { CreditCard, Lock, ShieldCheck, ArrowLeft } from 'lucide-react';
@@ -20,8 +21,9 @@ export default function Payment() {
   const navigate = useNavigate();
   const location = useLocation();
   const { booking, totalAmount, setLastBookingId, clearBooking } = useContext(BookingContext);
+  const { user } = useContext(AuthContext);
 
-  const grandTotal = location.state?.grandTotal ?? totalAmount;
+  const grandTotal = location.state?.grandTotal ?? totalAmount ?? 0;
 
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
@@ -29,10 +31,12 @@ export default function Payment() {
   const [cvv, setCvv] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Guard: Redirect or display empty prompt if no seats are currently held in state
   if (!booking?.seats?.length) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4 text-center">
         <p className="font-display text-3xl text-cream-100">Nothing to pay for yet</p>
+        <p className="text-sm text-cream-300/60">Select seats to proceed with payment.</p>
         <Link to="/" className="rounded-lg bg-crimson-600 px-5 py-2.5 text-sm font-semibold text-cream-50">
           Browse Movies
         </Link>
@@ -43,24 +47,31 @@ export default function Payment() {
   const handlePay = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      // Card fields above are demo-only and are never sent anywhere — this
-      // confirms the reservation via the real booking endpoint.
+      // API call matching FastAPI payload structure
       const res = await API.post('/bookings', {
-        show_id: booking.show.show_id,
+        show_id: booking.show?.show_id,
         seats: booking.seats.map((s) => s.id),
         total_amount: grandTotal,
+        user_id: user?.id || user?.email || 'guest_user',
       });
-      setLastBookingId(res.data.booking_id);
+
+      const bookingId = res.data.booking_id;
+      if (setLastBookingId) setLastBookingId(bookingId);
       toast.success('Payment successful!');
-      navigate(`/booking/confirmation/${res.data.booking_id}`);
+
+      // Reset local booking state after completion
+      if (clearBooking) clearBooking();
+
+      navigate(`/booking/confirmation/${bookingId}`);
     } catch (err) {
       const message = err.response?.data?.detail || 'Payment failed. Please try again.';
       toast.error(message);
+
+      // Redirect back to seat map if lock expired or seat is unavailable
       if (err.response?.status === 400) {
-        // Someone else grabbed one of these seats — send the user back to pick again.
-        clearBooking();
-        navigate(`/movies/${booking.movie.id}`);
+        navigate('/booking/seats');
       }
     } finally {
       setLoading(false);
@@ -71,35 +82,40 @@ export default function Payment() {
     <div className="mx-auto max-w-lg px-4 py-10 sm:px-6 lg:px-8">
       <button
         onClick={() => navigate(-1)}
-        className="mb-6 flex items-center gap-1.5 text-sm text-cream-300/60 hover:text-crimson-400"
+        className="mb-6 flex items-center gap-1.5 text-sm font-medium text-cream-300/60 hover:text-crimson-400"
       >
         <ArrowLeft className="h-4 w-4" /> Back to summary
       </button>
 
       <BookingSteps current={4} />
 
-      <div className="rounded-2xl border border-ink-500/60 bg-ink-800/60 p-6 shadow-card sm:p-8">
-        <div className="mb-6 flex items-center justify-between">
+      <div className="rounded-2xl border border-ink-500/60 bg-ink-800 p-6 shadow-card backdrop-blur sm:p-8">
+        <div className="mb-6 flex items-center justify-between border-b border-ink-500/40 pb-4">
           <h1 className="font-display text-3xl tracking-wide text-cream-50">Payment</h1>
           <span className="font-display text-2xl tracking-wide text-crimson-400">₹{grandTotal}</span>
         </div>
 
         <form onSubmit={handlePay} className="space-y-5">
+          {/* Name on Card */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Name on Card</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-cream-300/80">
+              Name on Card
+            </label>
             <input
               type="text"
               required
               value={cardName}
               onChange={(e) => setCardName(e.target.value)}
               placeholder="Jane Doe"
-              className="w-full rounded-lg border border-ink-500/60 bg-ink-800 px-3.5 py-2.5 text-sm text-cream-50
-                         placeholder:text-cream-300/30 focus:border-crimson-600 focus:outline-none focus:ring-1 focus:ring-crimson-600"
+              className="w-full rounded-lg border border-ink-500/60 bg-ink-900/60 px-3.5 py-2.5 text-sm text-cream-50 placeholder:text-cream-300/30 focus:border-crimson-500 focus:outline-none focus:ring-1 focus:ring-crimson-500"
             />
           </div>
 
+          {/* Card Number */}
           <div>
-            <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Card Number</label>
+            <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-cream-300/80">
+              Card Number
+            </label>
             <div className="relative">
               <CreditCard className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
               <input
@@ -110,15 +126,17 @@ export default function Payment() {
                 onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
                 placeholder="1234 5678 9012 3456"
                 minLength={19}
-                className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-3 text-sm text-cream-50
-                           placeholder:text-cream-300/30 focus:border-crimson-600 focus:outline-none focus:ring-1 focus:ring-crimson-600"
+                className="w-full rounded-lg border border-ink-500/60 bg-ink-900/60 py-2.5 pl-10 pr-3 text-sm text-cream-50 placeholder:text-cream-300/30 focus:border-crimson-500 focus:outline-none focus:ring-1 focus:ring-crimson-500"
               />
             </div>
           </div>
 
+          {/* Expiry & CVV */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Expiry</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-cream-300/80">
+                Expiry
+              </label>
               <input
                 type="text"
                 required
@@ -127,12 +145,14 @@ export default function Payment() {
                 onChange={(e) => setExpiry(formatExpiry(e.target.value))}
                 placeholder="MM/YY"
                 minLength={5}
-                className="w-full rounded-lg border border-ink-500/60 bg-ink-800 px-3.5 py-2.5 text-sm text-cream-50
-                           placeholder:text-cream-300/30 focus:border-crimson-600 focus:outline-none focus:ring-1 focus:ring-crimson-600"
+                className="w-full rounded-lg border border-ink-500/60 bg-ink-900/60 px-3.5 py-2.5 text-sm text-cream-50 placeholder:text-cream-300/30 focus:border-crimson-500 focus:outline-none focus:ring-1 focus:ring-crimson-500"
               />
             </div>
+
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-cream-200/80">CVV</label>
+              <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-cream-300/80">
+                CVV
+              </label>
               <div className="relative">
                 <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
                 <input
@@ -143,8 +163,7 @@ export default function Payment() {
                   onChange={(e) => setCvv(e.target.value.replace(/\D/g, '').slice(0, 3))}
                   placeholder="•••"
                   minLength={3}
-                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-3 text-sm text-cream-50
-                             placeholder:text-cream-300/30 focus:border-crimson-600 focus:outline-none focus:ring-1 focus:ring-crimson-600"
+                  className="w-full rounded-lg border border-ink-500/60 bg-ink-900/60 py-2.5 pl-10 pr-3 text-sm text-cream-50 placeholder:text-cream-300/30 focus:border-crimson-500 focus:outline-none focus:ring-1 focus:ring-crimson-500"
                 />
               </div>
             </div>
@@ -153,14 +172,13 @@ export default function Payment() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-crimson-600 py-3 text-sm font-semibold text-cream-50 shadow
-                       transition-all hover:bg-crimson-500 hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-50"
+            className="w-full rounded-lg bg-crimson-600 py-3 text-sm font-semibold text-cream-50 shadow-md transition-all hover:bg-crimson-500 hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? 'Processing…' : `Pay ₹${grandTotal}`}
           </button>
 
-          <p className="flex items-center justify-center gap-1.5 text-center text-xs text-cream-300/40">
-            <ShieldCheck className="h-3.5 w-3.5" /> Demo checkout — no real charge is made.
+          <p className="flex items-center justify-center gap-1.5 text-center text-xs text-cream-300/50">
+            <ShieldCheck className="h-3.5 w-3.5 text-cream-300/40" /> Demo checkout — no real charge is made.
           </p>
         </form>
       </div>

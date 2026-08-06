@@ -4,17 +4,16 @@ from contextlib import asynccontextmanager
 import os
 
 # Import route modules
-from app.routes import auth, movies
-# Import database client/instance (adjust based on your app/database.py structure)
+from app.routes import auth, movies,bookings
 from app.database.connection import db
 
-# Lifespan context manager to handle startup/shutdown tasks
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # --- STARTUP LOGIC ---
     print("Connecting to MongoDB and initializing services...")
     
-    # Auto-seed sample movies if the collection is empty
+    
     try:
         count = await db["movies"].count_documents({})
         if count == 0:
@@ -83,7 +82,8 @@ app.add_middleware(
 
 # Include Routers with standard API prefixes
 app.include_router(auth.router, prefix="/api/auth", tags=["Authentication"])
-app.include_router(movies.router, prefix="/api", tags=["Movies & Bookings"])
+app.include_router(movies.router, prefix="/api", tags=["Movies"])
+app.include_router(bookings.router, prefix="/api/bookings", tags=["Bookings"])
 
 # Health Check Route
 @app.get("/", tags=["Health Check"])
