@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import API from '../services/api';
 import { AuthContext } from '../context/AuthContext';
 import toast from 'react-hot-toast';
-import { Mail, Lock, Eye, EyeOff, Clapperboard, Ticket } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, Ticket } from 'lucide-react';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -36,13 +36,6 @@ export default function Login() {
         <div className="absolute inset-0 bg-film-grain opacity-[0.05] mix-blend-overlay" />
         <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-crimson-700/25 blur-3xl" />
 
-        <Link to="/" className="relative flex items-center gap-2 font-display text-2xl tracking-widest text-black">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-crimson-600">
-            <Clapperboard className="h-5 w-5 text-cream-50" />
-          </span>
-          Cine<span className="text-crimson-500">Pass</span>
-        </Link>
-
         <div className="relative">
           <Ticket className="h-10 w-10 text-crimson-500" />
           <h2 className="mt-6 font-display text-5xl leading-[1.05] tracking-wide text-cream-50">
@@ -53,7 +46,9 @@ export default function Login() {
           </p>
         </div>
 
-        <p className="relative text-xs uppercase tracking-widest text-cream-300/40">Premium Cinema Experience</p>
+        <p className="relative text-xs uppercase tracking-widest text-cream-300/40">
+          Premium Cinema Experience
+        </p>
       </div>
 
       {/* Form panel */}
@@ -68,15 +63,15 @@ export default function Login() {
             <div>
               <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Email</label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-3 text-sm text-cream-50
-                             placeholder:text-cream-300/30 transition-colors focus:border-crimson-600 focus:outline-none
+                  className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-black
+                             placeholder:text-gray-400 transition-colors focus:border-crimson-600 focus:outline-none
                              focus:ring-1 focus:ring-crimson-600"
                 />
               </div>
@@ -85,21 +80,21 @@ export default function Login() {
             <div>
               <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Password</label>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
+                <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-10 text-sm text-cream-50
-                             placeholder:text-cream-300/30 transition-colors focus:border-crimson-600 focus:outline-none
+                  className="w-full rounded-lg border border-gray-300 bg-white py-2.5 pl-10 pr-10 text-sm text-black
+                             placeholder:text-gray-400 transition-colors focus:border-crimson-600 focus:outline-none
                              focus:ring-1 focus:ring-crimson-600"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cream-300/40 hover:text-cream-200"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}

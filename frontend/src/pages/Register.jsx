@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../services/api';
 import toast from 'react-hot-toast';
-import { User, Mail, Lock, Eye, EyeOff, Clapperboard, Popcorn } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Popcorn } from 'lucide-react';
 
 export default function Register() {
   const [name, setName] = useState('');
@@ -28,93 +28,88 @@ export default function Register() {
 
   return (
     <div className="grid min-h-[calc(100vh-73px)] grid-cols-1 lg:grid-cols-2">
-      {/* Decorative panel */}
-      <div className="relative hidden overflow-hidden bg-ink-800 lg:flex lg:flex-col lg:justify-between lg:p-12">
+      {/* Left Decorative Panel */}
+      <div className="relative hidden overflow-hidden bg-stone-200/50 lg:flex lg:flex-col lg:justify-between lg:p-12 border-r border-stone-300/60">
         <div className="absolute inset-0 bg-spotlight" />
-        <div className="absolute inset-0 bg-film-grain opacity-[0.05] mix-blend-overlay" />
-        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-crimson-700/25 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-red-800/10 blur-3xl" />
 
-        <Link to="/" className="relative flex items-center gap-2 font-display text-2xl tracking-widest text-black">
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-crimson-600">
-            <Clapperboard className="h-5 w-5 text-cream-50" />
-          </span>
-          Cine<span className="text-crimson-500">Pass</span>
-        </Link>
-
-        <div className="relative">
-          <Popcorn className="h-10 w-10 text-crimson-500" />
-          <h2 className="mt-6 font-display text-5xl leading-[1.05] tracking-wide text-cream-50">
+        {/* Content Starts Direct with Hero Text (Duplicate Logo Removed) */}
+        <div className="relative my-auto">
+          <Popcorn className="h-10 w-10 text-red-800" />
+          <h2 className="mt-6 font-display text-5xl leading-[1.05] tracking-wide text-stone-900 font-bold">
             Reserve Your<br />Front Row.
           </h2>
-          <p className="mt-4 max-w-sm text-cream-200/60">
+          <p className="mt-4 max-w-sm text-stone-600 text-sm">
             Create your CinePass account to start booking tickets for the movies you don't want to miss.
           </p>
         </div>
 
-        <p className="relative text-xs uppercase tracking-widest text-cream-300/40">Premium Cinema Experience</p>
+        <p className="relative text-xs uppercase tracking-widest font-semibold text-stone-500">
+          Premium Cinema Experience
+        </p>
       </div>
 
-      {/* Form panel */}
+      {/* Form Panel */}
       <div className="flex items-center justify-center px-4 py-16 sm:px-6">
         <div className="w-full max-w-md">
           <div className="mb-8 text-center lg:text-left">
-            <h1 className="font-display text-4xl tracking-wide text-cream-50">Create Account</h1>
-            <p className="mt-2 text-sm text-cream-300/60">Join CinePass and never miss opening night.</p>
+            <h1 className="font-display text-4xl font-bold tracking-wide text-stone-900">Create Account</h1>
+            <p className="mt-2 text-sm text-stone-600">Join CinePass and never miss opening night.</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Full Name</label>
+              <label className="mb-1.5 block text-sm font-medium text-stone-700">Full Name</label>
               <div className="relative">
-                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
+                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Jane Doe"
-                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-3 text-sm text-cream-50
-                             placeholder:text-cream-300/30 transition-colors focus:border-crimson-600 focus:outline-none
-                             focus:ring-1 focus:ring-crimson-600"
+                  className="w-full rounded-xl border border-stone-300 bg-stone-200/60 py-2.5 pl-10 pr-3 text-sm text-stone-900
+                             placeholder:text-stone-500 transition-colors focus:border-red-800 focus:outline-none
+                             focus:ring-1 focus:ring-red-800"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Email</label>
+              <label className="mb-1.5 block text-sm font-medium text-stone-700">Email</label>
               <div className="relative">
-                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-3 text-sm text-cream-50
-                             placeholder:text-cream-300/30 transition-colors focus:border-crimson-600 focus:outline-none
-                             focus:ring-1 focus:ring-crimson-600"
+                  className="w-full rounded-xl border border-stone-300 bg-stone-200/60 py-2.5 pl-10 pr-3 text-sm text-stone-900
+                             placeholder:text-stone-500 transition-colors focus:border-red-800 focus:outline-none
+                             focus:ring-1 focus:ring-red-800"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Password</label>
+              <label className="mb-1.5 block text-sm font-medium text-stone-700">Password</label>
               <div className="relative">
-                <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
+                <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-500" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-10 text-sm text-cream-50
-                             placeholder:text-cream-300/30 transition-colors focus:border-crimson-600 focus:outline-none
-                             focus:ring-1 focus:ring-crimson-600"
+                  className="w-full rounded-xl border border-stone-300 bg-stone-200/60 py-2.5 pl-10 pr-10 text-sm text-stone-900
+                             placeholder:text-stone-500 transition-colors focus:border-red-800 focus:outline-none
+                             focus:ring-1 focus:ring-red-800"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cream-300/40 hover:text-cream-200"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-800"
                   tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -125,16 +120,16 @@ export default function Register() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-crimson-600 py-3 text-sm font-semibold text-cream-50 shadow
-                         transition-all hover:bg-crimson-500 hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full rounded-xl bg-red-800 py-3 text-sm font-semibold text-white shadow-md
+                         transition-all hover:bg-red-900 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Creating account…' : 'Register'}
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-cream-300/60">
+          <p className="mt-6 text-center text-sm text-stone-600">
             Already registered?{' '}
-            <Link to="/login" className="font-medium text-crimson-400 hover:text-crimson-300 hover:underline">
+            <Link to="/login" className="font-semibold text-stone-900 hover:underline">
               Login here
             </Link>
           </p>

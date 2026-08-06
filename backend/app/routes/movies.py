@@ -8,9 +8,6 @@ from app.schemas.schemas import MovieCreate, BookingCreate
 
 router = APIRouter()
 
-# Standard hall layout used to compute a seat map for any show on the fly.
-# Not stored in the DB — only which seats are already booked (via the
-# existing "bookings" collection) is real data; the layout itself is fixed.
 SEAT_ROWS = [
     {"row": "A", "category": "Premium", "price": 400},
     {"row": "B", "category": "Premium", "price": 400},
