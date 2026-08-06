@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import API from '../services/api';
-import { Search, Film } from 'lucide-react';
+import { Film, SlidersHorizontal, Popcorn, Frown } from 'lucide-react';
 import toast from 'react-hot-toast';
+import HeroBanner from '../components/HeroBanner';
+import MovieCard from '../components/MovieCard';
+import MovieCardSkeleton from '../components/MovieCardSkeleton';
+
+const GENRES = ['Action', 'Sci-Fi', 'Drama'];
 
 export default function MoviesPage() {
   const [movies, setMovies] = useState([]);
@@ -9,10 +14,10 @@ export default function MoviesPage() {
   const [genre, setGenre] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const fetchMovies = async () => {
+  const fetchMovies = async (params) => {
     setLoading(true);
     try {
-      const res = await API.get('/movies', { params: { search, genre } });
+      const res = await API.get('/movies', { params });
       setMovies(res.data);
     } catch (err) {
       toast.error('Failed to fetch movies');
@@ -21,71 +26,96 @@ export default function MoviesPage() {
     }
   };
 
+  // Debounced so typing in the hero search doesn't fire a request per keystroke.
+  // Same endpoint, same params, same behavior — just fewer network calls.
   useEffect(() => {
-    fetchMovies();
+    const handle = setTimeout(() => {
+      fetchMovies({ search, genre });
+    }, 350);
+    return () => clearTimeout(handle);
   }, [search, genre]);
 
   return (
-    <div className="py-6 max-w-6xl mx-auto">
-      <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
-        <h1 className="text-3xl font-extrabold flex items-center gap-2 text-white">
-          <Film className="text-indigo-500" /> Now Showing
-        </h1>
+    <div>
+      <HeroBanner onSearch={setSearch} />
 
-        {/* Search & Filter Controls */}
-        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 text-gray-400 w-4 h-4" />
-            <input
-              type="text"
-              placeholder="Search movies..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="bg-gray-800 border border-gray-700 rounded-lg pl-9 pr-4 py-2 text-sm w-full focus:outline-none focus:border-indigo-500"
-            />
+      <div id="now-showing" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-widest text-crimson-400">In theatres now</span>
+            <h2 className="mt-1 flex items-center gap-2 font-display text-4xl tracking-wide text-cream-50">
+              <Film className="h-7 w-7 text-crimson-500" /> Now Showing
+            </h2>
           </div>
-          <select
-            value={genre}
-            onChange={(e) => setGenre(e.target.value)}
-            className="bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-indigo-500"
-          >
-            <option value="">All Genres</option>
-            <option value="Action">Action</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-            <option value="Drama">Drama</option>
-          </select>
-        </div>
-      </div>
 
-      {/* Grid List */}
-      {loading ? (
-        <p className="text-center text-gray-400 py-10">Loading catalog...</p>
-      ) : movies.length === 0 ? (
-        <p className="text-center text-gray-400 py-10">No movies found.</p>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {movies.map((movie) => (
-            <div key={movie.id} className="bg-gray-800 rounded-xl border border-gray-700 p-5 flex flex-col justify-between hover:border-indigo-500 transition">
-              <div>
-                <span className="text-xs bg-indigo-900 text-indigo-300 font-semibold px-2.5 py-1 rounded-full uppercase">
-                  {movie.genre}
-                </span>
-                <h3 className="text-xl font-bold mt-3 text-white">{movie.title}</h3>
-                <p className="text-sm text-gray-400 mt-2 line-clamp-2">{movie.description}</p>
-              </div>
-              <div className="mt-6 pt-4 border-t border-gray-700 flex justify-between items-center text-xs text-gray-400">
-                <span>⏱️ {movie.duration_mins} mins</span>
-                <button
-                  onClick={() => toast.success(`Selected ${movie.title} for booking!`)}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-lg transition"
-                >
-                  Book Seat
-                </button>
-              </div>
+          {/* Genre filter chips */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="flex items-center gap-1 pr-1 text-xs font-medium text-cream-300/50">
+              <SlidersHorizontal className="h-3.5 w-3.5" /> Filter
+            </span>
+            <button
+              onClick={() => setGenre('')}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                genre === ''
+                  ? 'bg-crimson-600 text-cream-50'
+                  : 'border border-ink-500/60 text-cream-300/70 hover:border-crimson-600 hover:text-crimson-300'
+              }`}
+            >
+              All Genres
+            </button>
+            {GENRES.map((g) => (
+              <button
+                key={g}
+                onClick={() => setGenre(g)}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                  genre === g
+                    ? 'bg-crimson-600 text-cream-50'
+                    : 'border border-ink-500/60 text-cream-300/70 hover:border-crimson-600 hover:text-crimson-300'
+                }`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {Array.from({ length: 10 }).map((_, i) => (
+              <MovieCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : movies.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-ink-500/60 py-20 text-center">
+            <Frown className="h-10 w-10 text-cream-300/30" />
+            <p className="font-display text-2xl tracking-wide text-cream-200/70">No movies found</p>
+            <p className="text-sm text-cream-300/50">Try a different title or clear your filters.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-5 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+            {movies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} />
+            ))}
+          </div>
+        )}
+
+        {/* Value props — grounded in what CinePass actually offers today */}
+        <div className="mt-20 grid grid-cols-1 gap-6 border-t border-ink-500/60 pt-14 sm:grid-cols-3">
+          {[
+            { icon: Popcorn, title: 'Fresh Titles Daily', desc: 'New releases added to the catalog as soon as they drop.' },
+            { icon: SlidersHorizontal, title: 'Find It Fast', desc: 'Search by title or filter by genre to skip the scrolling.' },
+            { icon: Film, title: 'One-Tap Booking', desc: 'Pick a movie and lock in your seat in a couple of clicks.' },
+          ].map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="rounded-2xl border border-ink-500/60 bg-ink-800/60 p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-crimson-600/15 text-crimson-400">
+                <Icon className="h-5 w-5" />
+              </span>
+              <h3 className="mt-4 font-display text-xl tracking-wide text-cream-50">{title}</h3>
+              <p className="mt-1.5 text-sm text-cream-300/60">{desc}</p>
             </div>
           ))}
         </div>
-      )}
+      </div>
     </div>
   );
 }

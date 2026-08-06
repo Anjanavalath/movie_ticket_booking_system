@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import API from '../services/api';
 import toast from 'react-hot-toast';
+import { User, Mail, Lock, Eye, EyeOff, Clapperboard, Popcorn } from 'lucide-react';
 
 export default function Register() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -25,50 +27,119 @@ export default function Register() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 bg-gray-800 p-8 rounded-xl shadow-lg border border-gray-700">
-      <h2 className="text-2xl font-bold mb-6 text-center text-indigo-400">Create Account</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Full Name</label>
-          <input
-            type="text"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full bg-gray-700 border border-gray-600 rounded p-2.5 text-white focus:outline-none focus:border-indigo-500"
-          />
+    <div className="grid min-h-[calc(100vh-73px)] grid-cols-1 lg:grid-cols-2">
+      {/* Decorative panel */}
+      <div className="relative hidden overflow-hidden bg-ink-800 lg:flex lg:flex-col lg:justify-between lg:p-12">
+        <div className="absolute inset-0 bg-spotlight" />
+        <div className="absolute inset-0 bg-film-grain opacity-[0.05] mix-blend-overlay" />
+        <div className="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-crimson-700/25 blur-3xl" />
+
+        <Link to="/" className="relative flex items-center gap-2 font-display text-2xl tracking-widest text-black">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-crimson-600">
+            <Clapperboard className="h-5 w-5 text-cream-50" />
+          </span>
+          Cine<span className="text-crimson-500">Pass</span>
+        </Link>
+
+        <div className="relative">
+          <Popcorn className="h-10 w-10 text-crimson-500" />
+          <h2 className="mt-6 font-display text-5xl leading-[1.05] tracking-wide text-cream-50">
+            Reserve Your<br />Front Row.
+          </h2>
+          <p className="mt-4 max-w-sm text-cream-200/60">
+            Create your CinePass account to start booking tickets for the movies you don't want to miss.
+          </p>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Email</label>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-gray-700 border border-gray-600 rounded p-2.5 text-white focus:outline-none focus:border-indigo-500"
-          />
+
+        <p className="relative text-xs uppercase tracking-widest text-cream-300/40">Premium Cinema Experience</p>
+      </div>
+
+      {/* Form panel */}
+      <div className="flex items-center justify-center px-4 py-16 sm:px-6">
+        <div className="w-full max-w-md">
+          <div className="mb-8 text-center lg:text-left">
+            <h1 className="font-display text-4xl tracking-wide text-cream-50">Create Account</h1>
+            <p className="mt-2 text-sm text-cream-300/60">Join CinePass and never miss opening night.</p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Full Name</label>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Jane Doe"
+                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-3 text-sm text-cream-50
+                             placeholder:text-cream-300/30 transition-colors focus:border-crimson-600 focus:outline-none
+                             focus:ring-1 focus:ring-crimson-600"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Email</label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-3 text-sm text-cream-50
+                             placeholder:text-cream-300/30 transition-colors focus:border-crimson-600 focus:outline-none
+                             focus:ring-1 focus:ring-crimson-600"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-cream-200/80">Password</label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-cream-300/40" />
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-lg border border-ink-500/60 bg-ink-800 py-2.5 pl-10 pr-10 text-sm text-cream-50
+                             placeholder:text-cream-300/30 transition-colors focus:border-crimson-600 focus:outline-none
+                             focus:ring-1 focus:ring-crimson-600"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-cream-300/40 hover:text-cream-200"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-lg bg-crimson-600 py-3 text-sm font-semibold text-cream-50 shadow
+                         transition-all hover:bg-crimson-500 hover:shadow-glow disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? 'Creating account…' : 'Register'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-cream-300/60">
+            Already registered?{' '}
+            <Link to="/login" className="font-medium text-crimson-400 hover:text-crimson-300 hover:underline">
+              Login here
+            </Link>
+          </p>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Password</label>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-gray-700 border border-gray-600 rounded p-2.5 text-white focus:outline-none focus:border-indigo-500"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 py-2.5 rounded font-semibold transition disabled:opacity-50"
-        >
-          {loading ? 'Creating...' : 'Register'}
-        </button>
-      </form>
-      <p className="mt-4 text-center text-sm text-gray-400">
-        Already registered? <Link to="/login" className="text-indigo-400 hover:underline">Login here</Link>
-      </p>
+      </div>
     </div>
   );
 }

@@ -20,6 +20,10 @@ class MovieCreate(BaseModel):
     duration_mins: int
     language: str
     description: Optional[str] = None
+    # Optional so existing callers of POST /movies keep working unchanged.
+    poster: Optional[str] = None
+    rating: Optional[float] = None
+    release_date: Optional[str] = None
 
 class BookingCreate(BaseModel):
     show_id: str
